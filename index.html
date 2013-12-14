@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+	<head>
+		<title>HTML5 Drag &amp; Drop with Polyfill and Touch Support</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			
+			#dragme {
+				background-color: #BBD8E9;
+				border-radius: 3px;
+				padding: 14px;
+				text-align: center;
+				width: 200px;
+				height: 28px;
+			}
+			#dragme[draggable] {
+				cursor: move;
+			}
+			#dropzone, #dragzone {
+				padding: 20px;
+				margin: 10px;
+				width: 250px;
+				height: 150px;
+				border: 1px dashed #111;
+			}
+		</style>
+		<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+		<script src="dragdrop-polyfill.js"></script>
+		<script>
+			$(function(){
+				$('#dragme').dragdrop({forceShim: true}, {
+					dragstart: function(event){ console.log('dragstart');
+						var dt = event.originalEvent.dataTransfer;
+						dt.setData('Text', 'Sample Data');
+						dt.effectAllowed = 'copy';
+					}
+				});
+				
+				$('#dropzone').on('drop', function(event){
+					var data = event.originalEvent.dataTransfer.getData('Text');
+					$(this).html(data);
+				}).on('dragenter', function(event){event.preventDefault();return false;})
+				.on('dragover', function(event){event.preventDefault();return false;});
+				
+			});
+		</script>
+	</head>
+	<body>
+		<div id="dragzone">
+			<div id="dragme" draggable="true">Drag Me</div>
+		</div>
+		<div style="clear:both"></div>
+		<div id="dropzone" droppable="true"></div>
+	</body>
+</html>
