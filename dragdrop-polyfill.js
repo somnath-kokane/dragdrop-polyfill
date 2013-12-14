@@ -1,3 +1,7 @@
+// dragdrop-polyfill.js
+// version 1.0
+// (c) 2012-2013 Somnath Kokane. <in.somnath.kokane@gmail.com>
+// DragDrop-Polyfill may be freely distributed under the MIT license.
 (function($, dragdrop){
 	
 	var func = function(){
@@ -80,14 +84,6 @@
 						dY = this.clientY(event) - initialMouseY;
 					this.setPosition(dX, dY);
 				}
-				/*
-				console.log('droppableObject', el);
-				if($(el).attr('droppable') === true){ 
-					droppableObject = el;
-				} else {
-					droppableObject = null;
-				}
-				*/
 				return false;
 			},
 			mouseUp: function(event){ console.log('touchup', event, 'this', this);

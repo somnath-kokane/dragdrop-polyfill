@@ -39,8 +39,13 @@
 				$('#dropzone').on('drop', function(event){
 					var data = event.originalEvent.dataTransfer.getData('Text');
 					$(this).html(data);
-				}).on('dragenter', function(event){event.preventDefault();return false;})
-				.on('dragover', function(event){event.preventDefault();return false;});
+				}).on('dragenter', function(event){
+					event.preventDefault();
+					return false;
+				}).on('dragover', function(event){
+					event.preventDefault();
+					return false;
+				});
 				
 			});
 		</script>
