@@ -139,8 +139,10 @@
 				}
 				droppableObject = null;
 				var el = document.elementFromPoint(this.clientX(event), this.clientY(event));
-				if($(el).attr('droppable') === "true"){ 
+				if($(el).attr('droppable')){ 
 					droppableObject = el;
+				} else {
+					droppableObject = $(el).parents('[droppable]')[0];
 				}
 				
 				if(droppableObject){
