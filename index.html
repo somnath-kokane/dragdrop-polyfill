@@ -24,20 +24,23 @@
 				border: 1px dashed #111;
 			}
 		</style>
-		<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+		<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
 		<script src="dragdrop-polyfill.js"></script>
 		<script>
 			$(function(){
 				$('#dragme').dragdrop({forceShim: true}, {
-					dragstart: function(event){ console.log('dragstart');
-						var dt = event.originalEvent.dataTransfer;
+					dragStart: function(event){ console.log('dragstart');
+						event || (event = window.event);
+						var dt = event.originalEvent.dataTransfer || $(event.target).data('dataTransfer');
 						dt.setData('Text', 'Sample Data');
 						dt.effectAllowed = 'copy';
 					}
 				});
 				
 				$('#dropzone').on('drop', function(event){
-					var data = event.originalEvent.dataTransfer.getData('Text');
+					event || (event = window.event);
+					var dt = event.originalEvent.dataTransfer || $(event.target).data('dataTransfer');
+					var data = dt.getData('Text');
 					$(this).html(data);
 				}).on('dragenter', function(event){
 					event.preventDefault();

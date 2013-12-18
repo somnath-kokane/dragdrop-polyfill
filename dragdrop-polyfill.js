@@ -10,21 +10,31 @@
 	func.prototype = dragdrop();
 	func.prototype.constructor = func;
 	
-	$.fn.dragdrop = function(options, callbacks){
+	$.fn.dragdrop = function(options, methods){
 		options || (options = {});
-		callbacks || (callbacks = {});
+		methods || (methods = {});
+		var el = methods.el = this[0];
+		$.extend(this, methods);
+		this.on('dragstart', $.proxy(this, 'dragStart'));
+		this.selectStart || (this.selectStart = function(event){
+			event || (event = window.event);
+			event.preventDefault();
+			el.dragDrop && el.dragDrop();
+			return false;
+		});
+		this.on('selectstart', $.proxy(this, 'selectStart'));
+		if(el.dragDrop){
+			//return this;
+		}
 		options.el = this;
 		this.dragdrop = new func(options);
 		
-		if(callbacks.dragstart){
-			this.on('dragstart', $.proxy(callbacks, 'dragstart'));
-		}
 		return this;
 	};
 	
 })(jQuery, function(){
 	return (function(){
-		var startX, startY, dragEvent, dataTransfer, originalObject, draggedObject, droppableObject, initialMouseX, initialMouseY;
+		var startX, startY, dragEvent, dataTransfer, dragEventDataTransfer, originalObject, draggedObject, droppableObject, initialMouseX, initialMouseY;
 		return {
 			forceShim: false,
 			init: function(options){
@@ -99,13 +109,20 @@
 			},
 			capture: function(obj, event){ console.log('poly.capture');
 				var e = dragEvent = this.createEvent('dragstart'), effectAllowed = '';
-				e.dataTransfer = this.dataTransfer();
+				dragEventDataTransfer = this.dataTransfer();
+				e.target = event.target;
+				try{
+					e.dataTransfer = dragEventDataTransfer;
+				} catch (err){
+					$(e.target).data('dataTransfer', dragEventDataTransfer);
+					
+				}
 				e.target = event.target;
 				this.trigger(obj, e);
 				startX = obj.offsetLeft;
 				startY = obj.offsetTop;
 				originalObject = obj;
-				effectAllowed = e.dataTransfer.effectAllowed.toLowerCase();
+				effectAllowed = dragEventDataTransfer.effectAllowed.toLowerCase();
 				if(effectAllowed == 'move'){
 					draggedObject = obj;
 				} else {
@@ -124,12 +141,18 @@
 				}
 				var e;
 				e = this.createEvent('dragend');
-				e.dataTransfer = dragEvent.dataTransfer;
-				e.target = dragEvent.target;
-				e.clientX = this.clientX(event);
-				e.clientY = this.clientY(event);
+				
+				try {
+					e.dataTransfer = dragEvent.dataTransfer;
+					e.target = dragEvent.target;
+					e.clientX = this.clientX(event);
+					e.clientY = this.clientY(event);
+				} catch(err){
+					//
+				}
+				
 				this.trigger(originalObject, e);
-				var effectAllowed = e.dataTransfer.effectAllowed.toLowerCase();
+				var effectAllowed = dragEventDataTransfer.effectAllowed.toLowerCase();
 				if(effectAllowed === 'move'){
 					draggedObject.style.position = draggedObject.style.left = draggedObject.style.top = '';
 				} else {
@@ -147,12 +170,17 @@
 				
 				if(droppableObject){
 					var dropEvent = this.createEvent('drop');
-					dropEvent.dataTransfer = dragEvent.dataTransfer;
 					dropEvent.target = event.target;
+					try{
+						dropEvent.dataTransfer = dragEvent.dataTransfer;
+					} catch(err){
+						$(droppableObject).data('dataTransfer', dragEventDataTransfer);
+					}
+					
 					this.trigger(droppableObject, dropEvent);
 				}
 				
-				originalObject = draggedObject = droppableObject = dragEvent = null;
+				originalObject = draggedObject = droppableObject = dragEvent = dragEventdataTransfer = null;
 			},
 			trigger: function(el, e){
 				if(el.dispatchEvent){
